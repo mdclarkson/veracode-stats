@@ -13,7 +13,10 @@ class DataManager:
     @staticmethod
     def _read_report_file(report_filepath):
         with open(report_filepath, "r") as f:
-            return f.read()
+            string = f.read()
+            substrings = string.split("<severity level=\"5\"", maxsplit=1)
+            if len(substrings) == 2:
+                return substrings[0] + "</detailedreport>"
 
     def load_data(self, from_folder=None):
         report_filename_list = sorted(os.listdir(from_folder))
@@ -27,7 +30,8 @@ class DataManager:
             for unparsed_report in executor.map(self._read_report_file, report_filepath_list):
                 count += 1
                 print("\rLoading report files: {}/{}".format(count, len(report_filepath_list)), end="")
-                unparsed_reports.append(unparsed_report)
+                if unparsed_report is not None:
+                    unparsed_reports.append(unparsed_report)
             print("")
 
         with concurrent.futures.ProcessPoolExecutor() as executor:
