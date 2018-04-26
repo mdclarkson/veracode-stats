@@ -1,12 +1,30 @@
 import os
 import time
+import configparser
 from hashlib import sha256
 import hmac
 import codecs
 
 
+def _get_creds_from_config_file(auth_file):
+    if not os.path.exists(auth_file):
+        print("Missing Veracode credentials file, have you set up ~/.veracode/credentials?")
+
+    config = configparser.ConfigParser()
+    config.read(auth_file)
+    credentials_section_name = "default"
+    api_key_id = config.get(credentials_section_name, "VERACODE_API_KEY_ID")
+    api_key_secret = config.get(credentials_section_name, "VERACODE_API_KEY_SECRET")
+    if api_key_id and api_key_secret:
+        return api_key_id, api_key_secret
+    else:
+        print("Missing credentials in file, have you correctly set up ~/.veracode/credentials?")
+        return "", ""
+
+
 def _get_creds():
-    return os.environ.get("VERACODE_API_KEY_ID"), os.environ.get("VERACODE_API_KEY_SECRET")
+    auth_file = os.path.join(os.path.expanduser("~"), '.veracode', 'credentials')
+    return _get_creds_from_config_file(auth_file)
 
 
 def _get_timestamp():

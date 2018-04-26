@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="veracodestats",
-    version="2018.4.1",
+    version="2018.4.2",
     packages=["veracodestats", "veracodestats.model"],
     license="MIT",
     author="ctcampbell",
