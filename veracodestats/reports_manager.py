@@ -41,10 +41,11 @@ class ReportsManager:
             filename = build.attrib["build_id"] + ".xml"
             filepath = os.path.join(to_folder, filename)
 
-            try:
-                detailed_report_xml = self.api.get_detailed_report(build.attrib["build_id"])
-                with open(filepath, "wb") as f:
-                    f.write(detailed_report_xml)
-            except (VeracodeAPIError, IOError):
-                print("\r\nFailed to save report for {}".format(filename))
-                return
+            if not os.path.exists(filepath):
+                try:
+                    detailed_report_xml = self.api.get_detailed_report(build.attrib["build_id"])
+                    with open(filepath, "wb") as f:
+                        f.write(detailed_report_xml)
+                except (VeracodeAPIError, IOError):
+                    print("\r\nFailed to save report for {}".format(filename))
+                    return
