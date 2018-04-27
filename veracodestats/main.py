@@ -6,7 +6,7 @@ from veracodestats.reports_manager import ReportsManager
 from veracodestats import stats_manager
 
 
-def start():
+def run():
     parser = argparse.ArgumentParser(description="Generate interesting statistics for a Veracode account")
     parser.add_argument("report_folder", help="report save/load folder", type=str)
     parser.add_argument("-d", "--download",
@@ -35,7 +35,7 @@ def start():
     print("{: <10}{: <10}{: <10}".format("Year", "%", "Compliant/Scanned"))
     for year, app_dict in sorted(apps_scanned_by_year.items()):
         compliant_apps_list = apps_compliant_by_year.get(year, [])
-        print("{: <10}{: <10}{}/{}".format(year, round(100*len(compliant_apps_list)/len(app_dict.items())),
+        print("{: <10}{: <10}{}/{}".format(year, round(100 * len(compliant_apps_list) / len(app_dict.items())),
                                            len(compliant_apps_list), len(app_dict.items())))
 
     apps_scanned_by_year_by_policy = stats_manager.apps_scanned_by_year_by_policy(data.apps.values())
@@ -49,7 +49,8 @@ def start():
             print("{: <40}{: <10}".format(policy_name, len(app_list)))
         print("")
 
-    apps_scanned_by_year_by_month_by_scan_type = stats_manager.apps_scanned_by_year_by_month_by_scan_type(data.apps.values())
+    apps_scanned_by_year_by_month_by_scan_type = stats_manager.apps_scanned_by_year_by_month_by_scan_type(
+        data.apps.values())
 
     print("\r\nApps Scanned By Year/Month By Scan Type")
     print("---------------------------------------")
@@ -61,6 +62,13 @@ def start():
             dynamic_count = sum(app["dynamic"] for app in app_list.values())
             print("{: <10}{: <10}{: <10}".format(calendar.month_abbr[month], static_count, dynamic_count))
         print("")
+
+
+def start():
+    try:
+        run()
+    except KeyboardInterrupt:
+        print("\r\nExiting")
 
 
 if __name__ == "__main__":

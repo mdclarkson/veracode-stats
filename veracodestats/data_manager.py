@@ -1,7 +1,7 @@
 import os
 import concurrent.futures
 import xml.etree.cElementTree as cET
-import veracodestats.model as model
+from veracodestats.model import App, Sandbox, Build
 
 
 class DataManager:
@@ -46,10 +46,10 @@ class DataManager:
         for index, report in enumerate(parsed_reports):
             print("\rProcessing reports {}/{}".format(index + 1, len(parsed_reports)), end="")
 
-            app = self.apps.get(report.attrib["app_id"], model.App(report))
-            build = model.Build(report)
+            app = self.apps.get(report.attrib["app_id"], App(report))
+            build = Build(report)
             if build.sandbox_id:
-                sandbox = app.sandboxes.get(build.sandbox_id, model.Sandbox(report))
+                sandbox = app.sandboxes.get(build.sandbox_id, Sandbox(report))
                 sandbox.builds.append(build)
                 app.sandboxes[build.sandbox_id] = sandbox
             else:

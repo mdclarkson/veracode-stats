@@ -1,9 +1,9 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="veracodestats",
-    version="2018.4.2",
-    packages=["veracodestats", "veracodestats.model"],
+    version="2018.4.3",
+    packages=find_packages(),
     license="MIT",
     author="ctcampbell",
     url="https://github.com/ctcampbell/veracode-stats",
