@@ -6,20 +6,25 @@ import hmac
 import codecs
 
 
+class VeracodeHMACError(Exception):
+    """Raised when something goes wrong with generating an HMAC header"""
+    pass
+
+
 def _get_creds_from_config_file(auth_file):
     if not os.path.exists(auth_file):
         print("Missing Veracode credentials file, have you set up ~/.veracode/credentials?")
+        return
 
     config = configparser.ConfigParser()
     config.read(auth_file)
-    credentials_section_name = "default"
+    credentials_section_name = os.environ.get("VERACODE_API_PROFILE", "default")
     api_key_id = config.get(credentials_section_name, "VERACODE_API_KEY_ID")
     api_key_secret = config.get(credentials_section_name, "VERACODE_API_KEY_SECRET")
     if api_key_id and api_key_secret:
         return api_key_id, api_key_secret
     else:
         print("Missing credentials in file, have you correctly set up ~/.veracode/credentials?")
-        return "", ""
 
 
 def _get_creds():
@@ -44,6 +49,9 @@ def _create_signature(api_secret, signing_data, timestamp, nonce):
 
 def generate_veracode_hmac_header(host, url, method):
     api_id, api_secret = _get_creds()
+    if not api_id or not api_secret:
+        raise VeracodeHMACError
+
     signing_data = "id={api_id}&host={host}&url={url}&method={method}".format(api_id=api_id.lower(),
                                                                               host=host.lower(),
                                                                               url=url, method=method.upper())

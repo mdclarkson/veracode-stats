@@ -17,7 +17,7 @@ class ReportsManager:
         builds = []
 
         try:
-            print("Downloading app list")
+            print("Downloading application list")
             apps = cET.fromstring(self.api.get_app_list()).findall(self.tag_template.format("2.0", "app"))
 
             for index, app in enumerate(apps):
@@ -29,9 +29,9 @@ class ReportsManager:
                 for sandbox in sandboxes:
                     builds += cET.fromstring(self.api.get_build_list(app.attrib["app_id"], sandbox.attrib["sandbox_id"]))\
                         .findall(self.tag_template.format("2.0", "build"))
-        except VeracodeAPIError:
-            print("Could not download application list")
-            return
+        except VeracodeAPIError as e:
+            print("\r\nCould not download application list: {}".format(e))
+            raise
 
         print("")
 
@@ -46,6 +46,6 @@ class ReportsManager:
                     detailed_report_xml = self.api.get_detailed_report(build.attrib["build_id"])
                     with open(filepath, "wb") as f:
                         f.write(detailed_report_xml)
-                except (VeracodeAPIError, IOError):
-                    print("\r\nFailed to save report for {}".format(filename))
-                    return
+                except (VeracodeAPIError, IOError) as e:
+                    print("\r\nFailed to save report for {}: {}".format(filename, e))
+                    raise

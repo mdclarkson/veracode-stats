@@ -1,7 +1,7 @@
 import requests
 from urllib.parse import urlparse
 from requests.adapters import HTTPAdapter
-from veracodestats.api_hmac import generate_veracode_hmac_header
+from veracodestats.api_hmac import generate_veracode_hmac_header, VeracodeHMACError
 
 
 class VeracodeAPIError(Exception):
@@ -20,8 +20,11 @@ class VeracodeAPI:
             session.mount(self.baseurl, HTTPAdapter(max_retries=3))
             request = requests.Request("GET", url, params=params)
             prepared_request = request.prepare()
-            prepared_request.headers["Authorization"] = generate_veracode_hmac_header(urlparse(url).hostname,
-                                                                                      prepared_request.path_url, "GET")
+            try:
+                prepared_request.headers["Authorization"] = generate_veracode_hmac_header(urlparse(url).hostname,
+                                                                                          prepared_request.path_url, "GET")
+            except VeracodeHMACError:
+                raise VeracodeAPIError("Could not generate API HMAC header")
             r = session.send(prepared_request, proxies=self.proxies)
             if 200 >= r.status_code <= 299:
                 if r.content is None:

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="veracodestats",
-    version="2018.4.3",
+    version="2018.4.4",
     packages=find_packages(),
     license="MIT",
     author="ctcampbell",

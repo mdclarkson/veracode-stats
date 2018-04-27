@@ -1,9 +1,11 @@
 import os
+import sys
 import calendar
 import argparse
 from veracodestats.data_manager import DataManager
 from veracodestats.reports_manager import ReportsManager
 from veracodestats import stats_manager
+from veracodestats.api import VeracodeAPIError
 
 
 def run():
@@ -19,10 +21,13 @@ def run():
             os.makedirs(args.report_folder)
     except OSError:
         print("Could not create detailed report destination folder")
-        return
+        sys.exit(1)
 
     if args.download:
-        ReportsManager().download_reports(to_folder=args.report_folder)
+        try:
+            ReportsManager().download_reports(to_folder=args.report_folder)
+        except VeracodeAPIError:
+            sys.exit(1)
 
     data = DataManager()
     data.load_data(from_folder=args.report_folder)
@@ -38,9 +43,11 @@ def run():
         print("{: <10}{: <10}{}/{}".format(year, round(100 * len(compliant_apps_list) / len(app_dict.items())),
                                            len(compliant_apps_list), len(app_dict.items())))
 
+    print("")
+
     apps_scanned_by_year_by_policy = stats_manager.apps_scanned_by_year_by_policy(data.apps.values())
 
-    print("\r\nApps Scanned By Year By Policy")
+    print("Apps Scanned By Year By Policy")
     print("------------------------------")
     for year, policies in sorted(apps_scanned_by_year_by_policy.items()):
         print(year)
@@ -52,7 +59,7 @@ def run():
     apps_scanned_by_year_by_month_by_scan_type = stats_manager.apps_scanned_by_year_by_month_by_scan_type(
         data.apps.values())
 
-    print("\r\nApps Scanned By Year/Month By Scan Type")
+    print("Apps Scanned By Year/Month By Scan Type")
     print("---------------------------------------")
     for year, months in sorted(apps_scanned_by_year_by_month_by_scan_type.items()):
         print(year)
