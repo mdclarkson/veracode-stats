@@ -12,6 +12,7 @@ setup(
     install_requires=[
         "requests >= 2.18.4",
         "pytz >= 2018.4",
+        "defusedxml==0.7.1",
     ],
     entry_points={
         "console_scripts": ["veracodestats = veracodestats.main:start"]
