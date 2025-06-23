@@ -1,6 +1,6 @@
 import os
-import xml.etree.cElementTree as cET
 from veracodestats.api import VeracodeAPI, VeracodeAPIError
+import defusedxml.ElementTree
 
 
 class ReportsManager:
@@ -18,16 +18,16 @@ class ReportsManager:
 
         try:
             print("Downloading application list")
-            apps = cET.fromstring(self.api.get_app_list()).findall(self.tag_template.format("2.0", "app"))
+            apps = defusedxml.ElementTree.fromstring(self.api.get_app_list()).findall(self.tag_template.format("2.0", "app"))
 
             for index, app in enumerate(apps):
                 print("\rDownloading app build lists {}/{}".format(index + 1, len(apps)), end="")
-                builds += cET.fromstring(self.api.get_build_list(app.attrib["app_id"]))\
+                builds += defusedxml.ElementTree.fromstring(self.api.get_build_list(app.attrib["app_id"]))\
                     .findall(self.tag_template.format("2.0", "build"))
-                sandboxes = cET.fromstring(self.api.get_sandbox_list(app.attrib["app_id"]))\
+                sandboxes = defusedxml.ElementTree.fromstring(self.api.get_sandbox_list(app.attrib["app_id"]))\
                     .findall(self.tag_template.format("4.0", "sandbox"))
                 for sandbox in sandboxes:
-                    builds += cET.fromstring(self.api.get_build_list(app.attrib["app_id"], sandbox.attrib["sandbox_id"]))\
+                    builds += defusedxml.ElementTree.fromstring(self.api.get_build_list(app.attrib["app_id"], sandbox.attrib["sandbox_id"]))\
                         .findall(self.tag_template.format("2.0", "build"))
         except VeracodeAPIError as e:
             print("\r\nCould not download application list: {}".format(e))
